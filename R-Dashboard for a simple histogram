@@ -1,0 +1,57 @@
+library(shinydashboard)
+
+#creating a dashboard
+ui <- dashboardPage(
+  dashboardHeader(title = "Top 100 Batsman data"),
+  dashboardSidebar(
+    sidebarMenu(
+      menuItem("Dashboard", tabName = "dashboard", icon = icon("dashboard")),
+      selectInput(inputId = "RunTypes", label = "Select the type of runs made", choices = c("50" = "50", "100" = "100", "4s" = "4s", "6s" = "6s"),
+                     selected = "50")
+    )
+  ),
+  dashboardBody(
+    # Boxes need to be put in a row (or column)
+    fluidRow(
+      box(plotOutput("plot1")),
+      
+      box(
+        title = "Slider",
+        sliderInput("slider", "Matches", 1, 100, 50),
+        #adding a radiobutton in the sliderbar
+        radioButtons(inputId = "Colour1", label = "Select a colour", choices = c("Blue" = "Blue", "Purple" = "Purple"), 
+                     selected = "Blue")
+      )
+    )
+  )
+)
+
+server <- function(input, output) {
+  histdata <- Batsman[, 3]
+  
+  #adding colour choice for the histogram
+  output$plot1 <- renderPlot({
+    if (input$Colour1 == "Blue"){
+      scolor = "#0000FF"
+    }
+    else if(input$Colour1 == "Purple"){
+      scolor = "#800080"
+    }
+    
+    if (input$RunTypes == "50"){
+      hist(Batsman$`50`,input$slider, col = scolor)
+    }
+    if (input$RunTypes == "100"){
+      hist(Batsman$`100`,input$slider, col = scolor)
+    }
+    if (input$RunTypes == "4s"){
+      hist(Batsman$`4s`,input$slider, col = scolor)
+    }
+    if (input$RunTypes == "6s"){
+      hist(Batsman$`6s`,input$slider, col = scolor)
+    }
+    
+  })
+}
+shinyApp(ui, server)
+
